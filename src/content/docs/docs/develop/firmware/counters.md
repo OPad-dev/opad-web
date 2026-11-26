@@ -1,6 +1,6 @@
 ---
 editUrl: https://github.com/OPad-dev/OPad/edit/main/docs/develop/firmware/counters.md
-lastUpdated: 2026-11-23T00:32:10+01:00
+lastUpdated: 2026-11-26T09:52:52+01:00
 title: Firmware Counters Subsystem
 description: Implementation reference for monotonic keypress counters, sync validation rules, atomic delta rebasing, and lazy NVS checkpointing.
 sidebar:
@@ -46,4 +46,12 @@ Any press accepted between `counters_get(&current)` and `rebase_lifetime_presses
 
 ## Lazy Quiescence Checkpointing
 
-`checkpoint_locked` refuses writes whenever `runtime_get_state() != OPAD_STATE_IDLE` and skips writing when RAM matches `s_last_saved_key*` (unless `force`). `runtime_supervisor_task` calls `counters_checkpoint_due` ([/firmware/main/counters/counter_sync_rules.c](https://github.com/OPad-dev/OPad/blob/main/firmware/main/counters/counter_sync_rules.c)) in `IDLE` to checkpoint only after a quiescence window, on USB suspend (`counters_request_checkpoint` from `usb_event_handler`), or before a clean restart.
+`checkpoint_locked` refuses writes whenever `runtime_get_state() != OPAD_STATE_IDLE` and skips writing when RAM matches `s_last_saved_key*` (unless `force`). In `IDLE`, `runtime_supervisor_task` checkpoints when:
+
+- `counters_checkpoint_due()` ([/firmware/main/counters/counter_sync_rules.c](https://github.com/OPad-dev/OPad/blob/main/firmware/main/counters/counter_sync_rules.c)) says so: no press for `COUNTERS_CHECKPOINT_QUIET_US` (30 s), or the last checkpoint is older than `COUNTERS_CHECKPOINT_MAX_AGE_US` (300 s);
+- a USB suspend requested it (`counters_request_checkpoint()` from `usb_event_handler` in [/firmware/main/app_main.c](https://github.com/OPad-dev/OPad/blob/main/firmware/main/app_main.c));
+- a host-requested restart is about to run.
+
+A successful host sync and `counters_reset()` (which bumps the generation and rebases every key to 0) write at once with `checkpoint_locked(true)`. With NVS unavailable (`CONFIG_OPAD_TEST_FAIL_NVS` proves it) counters keep running in RAM only.
+
+How the desktop decides which side's counts win is in [Counters and Ownership](/docs/explanation/counters-and-ownership/).

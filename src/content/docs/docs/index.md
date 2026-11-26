@@ -1,42 +1,52 @@
 ---
 editUrl: https://github.com/OPad-dev/OPad/edit/main/docs/index.md
-lastUpdated: 2026-11-23T00:32:11+01:00
+lastUpdated: 2026-11-26T23:14:24+01:00
 title: OPad Documentation
-description: Overview of OPad, the low-latency ESP32-S3 osu! keypad and desktop suite, with starting points for users and developers.
+description: OPad is a low-latency osu! keypad on the Waveshare ESP32-S3-Touch-LCD-2, with optional desktop software for Linux and Windows 10/11.
 sidebar:
   order: 1
 ---
 
-OPad is a low-latency 1000 Hz USB HID osu! keypad built on the Waveshare ESP32-S3-Touch-LCD-2, paired with an optional Rust desktop suite (`opad-daemon`, `opad-gui`, `opadctl`) for Linux and Windows 10/11.
+OPad is a three-key osu! keypad built on the Waveshare ESP32-S3-Touch-LCD-2. It is a 1000 Hz USB keyboard: osu! plays with two keys, the third is there for your play style, and the touchscreen is a fourth button.
 
-The keypad works out of the box as a driverless USB keyboard with no software installed. Adding the optional desktop suite enables live osu! gameplay telemetry via `tosu`, a visual screen layout designer, lifetime key counters, touchscreen swipe actions, Hall Effect switch calibration and rapid trigger tuning, and hands-free USB firmware updates.
+You do not need any software to play: plug the pad in and it types like any keyboard, on Linux and Windows 10/11, with no driver. The optional desktop app (`opad-daemon`, `opad-gui` and `opadctl`) adds the extras:
 
-## Start Here (Using OPad)
+- live osu! map and play data on the pad's screen, through the bundled tosu;
+- a designer for the pad's idle and in-map screens;
+- lifetime key counters kept on the pad and on your PC;
+- touchscreen swipe actions;
+- Hall Effect calibration and rapid trigger;
+- firmware updates over USB.
 
-- [What You Need](/docs/start/what-you-need/) — Waveshare board, mechanical or Hall Effect switches, OPad V3 PCBs, and OS requirements.
-- [Wiring the Keys](/docs/start/wiring-the-keys/) — hand-wiring switches to Header P2 or assembling the V3 carrier and modules.
-- [First Connection](/docs/start/first-connection/) — plugging in the pad and verifying 1000 Hz USB HID typing without software.
-- [Installing the Desktop Suite](/docs/start/install-the-app/) — Linux packages (`.deb`, `.rpm`, Arch, AppImage) and the Windows installer.
+## Get started
 
-## Common Tasks
+1. [What you need](/docs/start/what-you-need/): your OPad, a USB-C data cable and a supported OS.
+2. [First connection](/docs/start/first-connection/): plug the pad in and check that it types.
+3. [Installing the desktop app](/docs/start/install-the-app/): Linux packages, AppImage and the Windows installer.
 
-- [Updating Firmware](/docs/guides/update-firmware/) — updating over USB from `opad-gui` or `opadctl` with automatic A/B rollback protection.
-- [Touchscreen & Swipes](/docs/guides/touchscreen-and-swipes/) — Quick Retry in maps and configurable swipe actions outside maps.
-- [Customizing the Screen Layout](/docs/guides/customize-screen-layout/) — designing, previewing, exporting, and importing custom `Idle` and `Playing` layouts in Screen Designer.
-- [Calibrating Hall Effect Switches](/docs/guides/calibrate-hall-effect/) — guided 5-press calibration and actuation / rapid trigger tuning.
-- [Changing Key Pins](/docs/guides/change-key-pins/) — rebinding hand-wired switch GPIOs and using **Auto-Detect**.
-- [Using OPad with tosu](/docs/guides/use-with-tosu/) — live osu! telemetry setup and Linux `ptrace` configuration.
-- [Backup and Restore](/docs/guides/backup-and-restore/) — exporting and importing configuration and lifetime key counters.
-- [Recovery, Reflashing & Unbinding](/docs/recovery/) — recovering an unresponsive pad without BOOT/RESET buttons, counter reconciliation, and unbinding.
-- [Troubleshooting](/docs/troubleshooting/) — non-QWERTY layouts, Linux Yama `ptrace_scope`, `udev` rules, Windows SmartScreen, and recovery.
-- [Uninstalling OPad](/docs/guides/uninstall/) — removing the desktop suite cleanly on Linux and Windows.
+## Build your own
 
-## Reference & Architecture
+- [Parts and boards](/docs/build/parts/): the Waveshare board, switches or V3 PCBs, cables and case.
+- [Wiring the keys](/docs/build/wiring-the-keys/): hand-wire two switches, or assemble the V3 carrier and module.
 
-- **Reference**: [`opadctl` CLI](/docs/reference/opadctl/), [GUI Reference](/docs/reference/gui/), [Device Settings](/docs/reference/device-settings/), [Pinout](/docs/reference/pinout/), [Serial Protocol](/docs/reference/serial-protocol/), [Daemon IPC](/docs/reference/ipc/), [Files & Paths](/docs/reference/files-and-paths/).
-- **Explanations**: [System Architecture](/docs/explanation/architecture/), [Latency Engineering](/docs/explanation/latency/), [Touchscreen as Third Button](/docs/explanation/touchscreen-third-button/), [App & Pad Versions](/docs/explanation/app-and-pad-versions/), [Counters & Ownership](/docs/explanation/counters-and-ownership/), [Updates & Rollback](/docs/explanation/updates-and-rollback/), [Hall Effect & Rapid Trigger](/docs/explanation/hall-effect/).
+## Common tasks
 
-## Developing OPad
+- [Update the firmware](/docs/guides/update-firmware/)
+- [Use the touchscreen and swipes](/docs/guides/touchscreen-and-swipes/)
+- [Customize the screen layout](/docs/guides/customize-screen-layout/)
+- [Calibrate Hall Effect switches](/docs/guides/calibrate-hall-effect/)
+- [Change the key pins](/docs/guides/change-key-pins/)
+- [Use OPad with tosu](/docs/guides/use-with-tosu/)
+- [Back up and restore](/docs/guides/backup-and-restore/)
+- [Uninstall the software](/docs/guides/uninstall/)
 
-- [Developer Hub](/docs/develop/) — contributor workflow, building firmware (ESP-IDF v5.5.2) and desktop (Rust), running tests, firmware and desktop internals, protocol changes, hardware, packaging, releases, and latency testing.
-- [Testing Checklist](https://github.com/OPad-dev/OPad/blob/main/docs/testing-checklist.md) — full hardware and software verification matrix.
+## When something goes wrong
+
+- [Troubleshooting](/docs/troubleshooting/): keyboard layouts, tosu on Linux, USB permissions, Windows warnings.
+- [Counters, recovery and unbinding](/docs/recovery/): how counters are reconciled, reflashing, and bringing back a pad that does not show up. No BOOT or RESET button is ever needed.
+
+## Reference and background
+
+- **Reference:** [`opadctl`](/docs/reference/opadctl/), [GUI](/docs/reference/gui/), [device settings](/docs/reference/device-settings/), [pinout](/docs/reference/pinout/), [serial protocol](/docs/reference/serial-protocol/), [daemon IPC](/docs/reference/ipc/), [files and paths](/docs/reference/files-and-paths/).
+- **How it works:** [architecture](/docs/explanation/architecture/), [latency](/docs/explanation/latency/), [the touchscreen as a fourth button](/docs/explanation/touchscreen-button/), [app and pad versions](/docs/explanation/app-and-pad-versions/), [counters and ownership](/docs/explanation/counters-and-ownership/), [updates and rollback](/docs/explanation/updates-and-rollback/), [Hall Effect and rapid trigger](/docs/explanation/hall-effect/).
+- **Contributing:** the [developer hub](/docs/develop/) covers building, testing, internals, packaging and releases. The [testing checklist](https://github.com/OPad-dev/OPad/blob/main/docs/testing-checklist.md) lists every hardware and software check.

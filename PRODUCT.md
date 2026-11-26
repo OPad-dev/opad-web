@@ -18,7 +18,7 @@ OPad is a three-key osu! keypad built on the Waveshare ESP32-S3-Touch-LCD-2 (osu
 Success for the site: a visitor understands what OPad is in one screen, players want one, builders reach the build guide, owners reach the download and docs.
 
 ## Positioning
-- **Sell to players, not engineers.** It is a three-key osu! keypad (Z, X, C) with a touchscreen that shows your play live. The landing speaks in what the player sees and gets: live PP/accuracy/combo, touch to retry, plug and play, magnetic switches with Rapid Trigger, every press counted. No internals (cores, USB endpoints, debounce, polling, latency engineering): that depth lives in the docs.
+- **Sell to players, boldly, and only with what is true.** It is a three-key osu! keypad (Z, X, C) with a touchscreen that shows your play live. The landing is confident launch copy: short, punchy lines that make OPad sound like the keypad to beat, as in the brag film (`~/Documents/projects/esp32/opad-brag/`). Every claim must be backed by the OPad docs or code (instant press, a USB lane per game key at 1000 Hz, magnetic keys read 20,000 times a second, Rapid Trigger, updates that can't brick it), told as what the player gets, not how it works. Lines with no fact in them may only be aspiration ("Your keypad should be faster"), never a comparison with other products ("the best on the market", "faster than X") or a number nobody published (the 20 µs measured on one pad during the film is not in the docs, so it stays off). How it works underneath stays in the docs.
 - **A keyboard first.** It types with no driver and no software. The app only adds features.
 - **The screen is part of the instrument**: live gameplay stats on the pad, a designer for the Idle and Playing screens, and a touch Quick Retry.
 - **Can't be bricked by an update**: two firmware slots, automatic rollback, no BOOT or RESET button ever.
@@ -38,7 +38,7 @@ Competitive osu! / osu!lazer on a desk next to the keyboard and tablet/mouse. to
 - The site uses **the app's colors** (user requirement): `desktop/gui/src/theme.rs`. Background #0E0E16, surface #13131E, card #1B1B28, card hover #24243A, border #2A2A3C, pink #FF66AA (hover #FF85BD), white, muted #8C8CA6, green #44DD88, red #FF5566, off #3A3A4C, cyan #66CCFF, yellow #FFCC33.
 - The app's typeface is **Montserrat** (Medium and Bold).
 - The logo in `docs/assets/` is explicitly a placeholder (violet keycap with an "O" ring); it is not a binding brand asset.
-- Voice of the docs: plain, exact, technical, never hype.
+- Voice of the landing: bold, confident, short. Voice of the docs: plain, exact, technical, never hype.
 
 ## Evidence on Hand
 - Documentation (EN + ES): `~/Documents/OPad-docs/docs`.
