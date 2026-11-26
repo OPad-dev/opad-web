@@ -1,6 +1,5 @@
 ---
-import { Font, Image } from 'astro:assets';
-import caseStill from '../assets/opad-case.png';
+import { Font } from 'astro:assets';
 import Case3D from './Case3D.astro';
 import Icon from './Icon.astro';
 import PadScreen from './PadScreen.astro';
@@ -83,37 +82,7 @@ const url = (path: string) => new URL(path, Astro.site).href;
 						{s.hero.availability}
 					</p>
 				</div>
-				<p class="option-tag">Opción 1 · 3D interactivo</p>
 				<Case3D lang={lang} />
-			</section>
-
-			<!-- Temporary: option 2, the same hero with a still image, to compare. -->
-			<section class="hero hero-alt" aria-label="Opción 2">
-				<div class="hero-text">
-					<p class="h1" aria-hidden="true">{s.hero.title}</p>
-					<p class="lede">{s.hero.lede}</p>
-					<div class="actions">
-						<a class="btn btn-primary" href="#get">
-							{s.hero.primary}
-							<Icon name="arrow-right" />
-						</a>
-						<a class="btn" href="#live">{s.hero.secondary}</a>
-					</div>
-					<p class="availability">
-						<span class="dot" aria-hidden="true"></span>
-						{s.hero.availability}
-					</p>
-				</div>
-				<p class="option-tag">Opción 2 · Imagen estática</p>
-				<Image
-					class="case-still"
-					src={caseStill}
-					alt={s.pad.label}
-					widths={[480, 832, 1248, 1664]}
-					sizes="(width < 56rem) 100vw, 52rem"
-					format="webp"
-					quality={82}
-				/>
 			</section>
 
 			<section class="band live" id="live" aria-labelledby="live-title">

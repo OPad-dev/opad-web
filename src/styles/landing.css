@@ -211,8 +211,7 @@
 		margin-inline: auto;
 		padding: var(--space-7) clamp(var(--space-4), 5vw, var(--space-8)) var(--space-9);
 		text-align: center;
-		& .case3d,
-		& .case-still {
+		& .case3d {
 			max-inline-size: 52rem;
 		}
 	}
@@ -252,34 +251,6 @@
 			background: var(--yellow);
 			translate: 0 -0.1rem;
 		}
-	}
-
-	.hero-text .h1 {
-		font-weight: 700;
-		line-height: 1.12;
-		font-size: clamp(2.5rem, 4.6vw, 4rem);
-		letter-spacing: -0.03em;
-		max-inline-size: 16ch;
-		text-wrap: balance;
-	}
-	.hero-alt {
-		border-block-start: 2px dashed var(--yellow);
-	}
-	.case-still {
-		display: block;
-		inline-size: 100%;
-		block-size: auto;
-	}
-
-	/* Temporary: labels the two hero options while one is chosen. */
-	.option-tag {
-		margin-block-end: calc(var(--space-6) * -1);
-		padding: 0.2rem 0.75rem;
-		border: 1px dashed var(--yellow);
-		border-radius: 999px;
-		color: var(--yellow);
-		font-size: 0.8125rem;
-		font-weight: 500;
 	}
 
 	/* Your play, live: the screen during a map. */

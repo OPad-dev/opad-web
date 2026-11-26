@@ -5,9 +5,9 @@ Está ordenada por impacto: lo de arriba es lo que más vende.
 
 ## 1. Una imagen del producto que venda
 
-Ahora mismo la página principal muestra el OPad de dos formas para comparar: un modelo 3D interactivo
-(opción 1) y una imagen fija (opción 2). Las dos salen del modelo real de la carcasa, pero se ven
-"de videojuego": luz plana, plástico sin textura y teclas inventadas.
+La página principal muestra el OPad como modelo 3D interactivo, sacado del modelo real de la carcasa
+(se descartó la versión con imagen fija). Se ve "de videojuego": luz plana, plástico sin textura y teclas
+inventadas.
 
 Hay dos caminos (se pueden combinar):
 
@@ -22,9 +22,7 @@ Hay dos caminos (se pueden combinar):
   - [ ] Si los interruptores se ven bajo las teclas, y de qué color son.
   - [ ] Qué vista enseña la pantalla: entre mapas (hora y pulsaciones) o durante una partida (PP, combo).
 
-Cuando haya imagen buena:
-
-- [ ] Elegir la opción definitiva y quitar la otra, junto con las etiquetas amarillas "Opción 1/2".
+- [x] Elegir entre 3D e imagen fija: se queda el 3D.
 
 ## 2. Datos del Kickstarter
 
@@ -75,5 +73,5 @@ Falta una sección corta con lo que un jugador quiere saber antes de comprar, si
 - [ ] Escribir `DESIGN.md` con el sistema visual (colores, tipografía, componentes) para que futuros cambios sean
   coherentes.
 - [ ] Repaso de rendimiento: la portada a veces tarda en responder en móviles lentos y el modelo 3D pesa unos
-  290 KB. Si se queda la opción 2, ese peso desaparece.
+  290 KB.
 - [ ] Repaso de accesibilidad y de los textos en inglés y español.
