@@ -63,7 +63,7 @@ Falta una sección corta con lo que un jugador quiere saber antes de comprar, si
 
 ## 6. Publicarla
 
-- [ ] **Dominio.** En `astro.config.mjs` está puesto `https://opad.example` como provisional. Hay que poner el real.
+- [x] **Dominio.** `https://opad.dev`, configurado en `astro.config.mjs`.
 - [ ] **Alojamiento gratuito**: GitHub Pages o Cloudflare Pages.
 - [ ] **Construcción automática en GitHub.** La web copia la documentación y el modelo 3D del repositorio OPad al
   construirse, así que el proceso automático tiene que descargar ese repositorio primero. Lo preparo cuando se

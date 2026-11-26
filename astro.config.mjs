@@ -7,7 +7,7 @@ const group = (label, es, directory, collapsed = true) => ({ label, translations
 
 export default defineConfig({
 	// TODO: set the real domain once the site is published.
-	site: 'https://opad.example',
+	site: 'https://opad.dev',
 	trailingSlash: 'always',
 	fonts: [
 		{
