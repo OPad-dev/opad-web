@@ -5,7 +5,7 @@
 web
 
 ## Stack
-Astro + Starlight (chosen earlier in this repo; the user delegated the rest). Static site, built locally for now; it will move to GitHub later. The documentation is not written here: it is synced from the OPad repository (`docs/`, branch `docs/overhaul`, local worktree `~/Documents/OPad-docs`).
+Astro + Starlight (chosen earlier in this repo; the user delegated the rest). Static site, served at https://opad.dev from the project's own server (Caddy), which rebuilds it on every push to `main` of opad-web or OPad. The documentation and the 3D case are not written here: they are synced from the OPad repository's `main` on GitHub (`docs/`, `hardware/3d/custom_case/V4`).
 
 ## Users
 - **osu! players who don't have a pad yet.** The site has to make them want one: what it is, why it is different, what it looks like in use.

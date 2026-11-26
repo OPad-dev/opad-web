@@ -6,8 +6,9 @@ Está ordenada por impacto: lo de arriba es lo que más vende.
 ## 1. Una imagen del producto que venda
 
 La página principal muestra el OPad como modelo 3D interactivo, sacado del modelo real de la carcasa V4
-(negra de PETG, con las ranuras de los lados en azul claro; se descartó la versión con imagen fija). Aún se ve
-"de videojuego": plástico sin textura y teclas inventadas.
+(negra de PETG, con las ranuras de los lados en azul claro; se descartó la versión con imagen fija). Las teclas
+(perfil Cherry) y los interruptores MX tienen sus medidas reales y todo el plástico es mate, pero sigue siendo un
+render: una foto o un render de estudio venderían más.
 
 Hay dos caminos (se pueden combinar):
 
@@ -62,11 +63,9 @@ Falta una sección corta con lo que un jugador quiere saber antes de comprar, si
 ## 6. Publicarla
 
 - [x] **Dominio.** `https://opad.dev`, configurado en `astro.config.mjs`.
-- [ ] **Alojamiento gratuito en GitHub Pages.** El workflow `.github/workflows/deploy.yml` ya construye y publica la
-  web en cada push, a diario y a mano. Falta: subirlo, activar Pages en el repositorio (Settings → Pages → Source:
-  GitHub Actions) y apuntar el DNS de `opad.dev` a GitHub Pages.
-- [ ] Opcional: que OPad avise a la web al cambiar `main` (un `repository_dispatch` de tipo `opad-updated`), para
-  no esperar a la construcción diaria. Necesita un token con permiso sobre `opad-web` guardado en OPad.
+- [x] **Alojamiento.** En el servidor propio, con Caddy y HTTPS, detrás de Cloudflare.
+- [x] **Publicación automática.** El servidor mira GitHub cada minuto y, si hay commits nuevos en `main` de
+  opad-web o de OPad, recompila y publica la web en 1–2 minutos.
 
 ## 7. Repaso final (lo hago yo cuando lo anterior esté)
 

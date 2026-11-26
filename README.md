@@ -30,4 +30,4 @@ What is still needed to finish the site (in Spanish): [PENDIENTE.md](PENDIENTE.m
 
 ## Deploy
 
-`.github/workflows/deploy.yml` builds the site and publishes it on GitHub Pages on every push to `main`, every day, by hand, and on a `repository_dispatch` of type `opad-updated`. Each build fetches OPad's `main`, so the published docs and case follow it.
+https://opad.dev is served by Caddy on the project's server. A systemd timer there checks GitHub every minute and, when `main` of this repository or of OPad has new commits, rebuilds the site and switches to the new version (1–2 minutes after the push). A failed build leaves the previous version online. Each build fetches OPad's `main`, so the published docs and case follow it.
