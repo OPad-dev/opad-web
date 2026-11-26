@@ -33,7 +33,7 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'OPad',
-			description: 'Documentation for OPad, a low-latency two-key osu! keypad with a touchscreen.',
+			description: 'Documentation for OPad, a low-latency three-key osu! keypad with a touchscreen.',
 			defaultLocale: 'root',
 			locales: {
 				root: { label: 'English', lang: 'en' },
@@ -44,16 +44,18 @@ export default defineConfig({
 			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/OPad-dev/OPad' }],
 			customCss: ['./src/styles/tokens.css', './src/styles/starlight-opad.css'],
 			components: { Head: './src/components/DocsHead.astro' },
+			// The docs have udev rules blocks; Shiki has no udev grammar, and key="value" pairs read well as ini.
+			expressiveCode: { shiki: { langAlias: { udev: 'ini' } } },
 			sidebar: [
 				{ label: 'Overview', translations: { es: 'Inicio' }, slug: 'docs' },
 				group('Get started', 'Primeros pasos', 'docs/start', false),
+				group('Build your own', 'Monta el tuyo', 'docs/build'),
 				group('Guides', 'Guías', 'docs/guides'),
 				{ label: 'Troubleshooting', translations: { es: 'Solución de problemas' }, slug: 'docs/troubleshooting' },
 				{ label: 'Recovery', translations: { es: 'Recuperación' }, slug: 'docs/recovery' },
 				group('Reference', 'Referencia', 'docs/reference'),
 				group('How it works', 'Cómo funciona', 'docs/explanation'),
 				group('Contributing', 'Contribuir', 'docs/develop'),
-				{ label: 'Testing checklist', translations: { es: 'Lista de pruebas' }, slug: 'docs/testing-checklist' },
 			],
 		}),
 	],

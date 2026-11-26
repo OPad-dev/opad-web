@@ -1,11 +1,12 @@
 // Copies the OPad case model (OpenSCAD's ASCII STL) from the OPad repository into
 // public/models as compact binary STL, for the landing's 3D view.
-// Source: $OPAD_REPO_DIR (default ../OPad-docs)/hardware/3d/custom_case/V3.
+// Source: hardware/3d/custom_case/V3 of the OPad repository (see opad-repo.mjs).
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { opadRepo } from './opad-repo.mjs';
 
-const repo = resolve(process.env.OPAD_REPO_DIR ?? '../OPad-docs');
-const src = resolve(repo, 'hardware/3d/custom_case/V3');
+const repo = opadRepo();
+const src = repo ? resolve(repo, 'hardware/3d/custom_case/V3') : '(OPad repository not available)';
 const out = resolve('public/models');
 const parts = { 'opad_case_top.stl': 'case-top.stl', 'opad_case_bottom.stl': 'case-bottom.stl' };
 
@@ -14,7 +15,7 @@ if (!existsSync(src)) {
 		console.warn(`sync-model: ${src} not found; keeping the models already in public/models.`);
 		process.exit(0);
 	}
-	console.error(`sync-model: ${src} not found. Set OPAD_REPO_DIR to the OPad repository.`);
+	console.error(`sync-model: ${src} not found. Check the connection or set OPAD_REPO_DIR to a local checkout.`);
 	process.exit(1);
 }
 

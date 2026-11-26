@@ -1,0 +1,62 @@
+---
+editUrl: https://github.com/OPad-dev/OPad/edit/main/docs/develop/lab.md
+lastUpdated: 2026-11-24T22:27:59+01:00
+title: Automated Testing Lab
+description: Self-hosted multi-OS VirtualBox testing lab architecture, VM topology, install/upgrade/uninstall validation, and health checks.
+sidebar:
+  order: 8
+---
+
+OPad validates installers, upgrades, and clean uninstallation across Linux and Windows in a self-hosted VirtualBox lab ([/scripts/lab/lab-common.ps1](https://github.com/OPad-dev/OPad/blob/main/scripts/lab/lab-common.ps1)).
+
+## 1. Host Architecture & Security Model
+
+The lab runs on a Windows 11 host with Oracle VirtualBox (`C:\opad-lab`), registered as a self-hosted GitHub Actions runner with labels `[self-hosted, opad-lab]`.
+
+<pre class="mermaid">
+flowchart TD
+    GH["GitHub Actions (lab-install.yml / lab-check.yml)"] --&gt;|"runs-on: [self-hosted, opad-lab]"| Host["Windows 11 Host (VirtualBox)"]
+    Host --&gt; Snap["Restore Clean 'limpia' Snapshot"]
+    Snap --&gt; Boot["Boot Headless VMs"]
+    Boot --&gt; Linux["Ubuntu 22.04 / 24.04 / 26.04, Fedora 43, Arch"]
+    Boot --&gt; Win["Windows 10 / Windows 11"]
+    Linux --&gt; LTest["vm-install-linux.sh over SSH"]
+    Win --&gt; WTest["vm-install-windows.ps1 over SSH"]
+</pre>
+
+> [!IMPORTANT]
+> **No Pull Request Execution**: The self-hosted runner never executes untrusted pull requests or forks. It runs only on official release / `main` workflows ([/.github/workflows/lab-install.yml](https://github.com/OPad-dev/OPad/blob/main/.github/workflows/lab-install.yml), [/.github/workflows/lab-check.yml](https://github.com/OPad-dev/OPad/blob/main/.github/workflows/lab-check.yml)).
+
+## 2. Target VM Topology
+
+Defined in `$AllVms` ([/scripts/lab/lab-common.ps1](https://github.com/OPad-dev/OPad/blob/main/scripts/lab/lab-common.ps1)):
+
+| VM Name | Guest OS | Package Format | Forwarded SSH Port |
+|---|---|---|---|
+| `ubuntu-22.04` | Ubuntu 22.04 LTS | `.deb` | `2222` |
+| `ubuntu-24.04` | Ubuntu 24.04 LTS | `.deb` | `2224` |
+| `ubuntu-26.04` | Ubuntu 26.04 LTS | `.deb` | `2226` |
+| `fedora-43` | Fedora 43 | `.rpm` | `2243` |
+| `arch` | Arch Linux | `opad-bin` / `pacman` | `2250` |
+| `windows-10` | Windows 10 | `opad-setup.exe` | `2310` |
+| `windows-11` | Windows 11 | `opad-setup.exe` | `2311` |
+
+One more VM, `ci-linux` (Ubuntu 24.04, SSH port `2260`), is not in `$AllVms` and has no `limpia` snapshot: it is kept between runs, with its build caches, for the Linux jobs of the lab CI that runs before every push of `main` ([/scripts/ci/lab-ci.sh](https://github.com/OPad-dev/OPad/blob/main/scripts/ci/lab-ci.sh), set up by [/scripts/ci/provision-linux.sh](https://github.com/OPad-dev/OPad/blob/main/scripts/ci/provision-linux.sh); see [testing.md](/docs/develop/testing/)). The Windows jobs run on the mini PC itself, in `C:\opad-lab\ci`. The mini PC's disk is small for all of this: `ci-linux`'s disk has discard on (`VBoxManage storageattach ci-linux --storagectl SATA --port 0 --device 0 --nonrotational on --discard on`) and each run ends with `fstrim`, so its image shrinks back; `lab-ci.sh` removes the Windows build cache under 20 GB free and stops under 10 GB, and `lab-run.sh` starts the Linux cache over past 10 GB.
+
+Each VM auto-logs into an `opad` desktop session (`seat0` on Linux, active console on Windows) with passwordless `sudo` / Administrator elevation over loopback SSH (`127.0.0.1`).
+
+## 3. Automated Install, Upgrade, and Uninstall Lifecycle
+
+The release's packages are its assets, picked by type and checked against the SHA-256 GitHub gives for each (`digest`), so the names from `1.0.0-rc.7` on (`OPad-Linux-*`, `OPad-Windows-Setup-*`) and the older ones both work. `FILES.sha256` and the `opad-bin` PKGBUILD are assets of the older releases; from `1.0.0-rc.7` on they are the `release-extras-<tag>` artifact of the run that built the release (kept 90 days, read with the job's `actions: read` token). Once it has expired, Arch installs the built `.pkg.tar.zst` with `pacman -U` and the installed files are not checked against `FILES.sha256`.
+
+Driven by [/scripts/lab/lab-install.ps1](https://github.com/OPad-dev/OPad/blob/main/scripts/lab/lab-install.ps1), [/scripts/lab/vm-install-linux.sh](https://github.com/OPad-dev/OPad/blob/main/scripts/lab/vm-install-linux.sh) (normalized to LF line endings before upload), and [/scripts/lab/vm-install-windows.ps1](https://github.com/OPad-dev/OPad/blob/main/scripts/lab/vm-install-windows.ps1):
+
+1. **Clean Baseline**: Restores the `limpia` snapshot, boots headless until the desktop session is ready, installs the baseline release, and reboots to verify autostart.
+2. **In-Place Upgrade (`-Feed` or direct)**:
+   - When invoked with `feed: true` (from `release-app.yml`, unpacking the not-yet-deployed `github-pages` artifact) or `deployed_feed: true` (manual dispatch), `lab-install.ps1` copies `beta.json` and `beta.json.minisig` into the VM and runs the `update` phase: serves the feed on loopback (`127.0.0.1:8000`), restarts `opad-daemon` with `OPAD_MANIFEST_URL=http://127.0.0.1:8000/beta.json`, and asks it over IPC to switch to `beta`, check, and install. On Ubuntu/Fedora/Windows OPad's own updater downloads, verifies, and installs the candidate release (through `pkexec` or `/SILENT`); on Arch the updater must report `notify_only` and `makepkg` installs the package directly. If the updater fails, the run is marked failed and the package is installed directly so the remaining checks still execute.
+   - Without `-Feed`, installs the candidate package directly. Reboots and verifies binary version (`FILES.sha256`), running `opad-daemon` and tray GUI, `opadctl status` (decoding missing-DLL NTSTATUS codes on Windows), `cap_sys_ptrace=eip` on `.deb`/`.rpm` `tosu`, and persistence of `opad.db` (`~/.local/share/opad/opad.db` on Linux, `%APPDATA%\opad\opad.db` on Windows).
+3. **Clean Uninstallation**: Uninstalls the package/installer and verifies removal of binaries (`/usr/bin/` on Linux, `%LOCALAPPDATA%\Programs\opad` on Windows), autostart/systemd files, `udev` rules, background processes, and any `tosu` directories carrying OPad's `.created-by-opad` marker (unmarked directories are kept and noted with `info:`), then powers off and restores `limpia`.
+
+## 4. On-Demand Health Checks
+
+[/.github/workflows/lab-check.yml](https://github.com/OPad-dev/OPad/blob/main/.github/workflows/lab-check.yml) boots VMs from `limpia`, verifies SSH/session readiness, captures desktop screenshots via `VBoxManage controlvm screenshotpng`, and publishes summaries with [/scripts/lab/lab-results.ps1](https://github.com/OPad-dev/OPad/blob/main/scripts/lab/lab-results.ps1) (which also marks any prior orphaned `"running"` run as failed with an `Interrupted` group and records `info:` lines).

@@ -20,9 +20,8 @@ pnpm-debug.log*
 # macOS-specific files
 .DS_Store
 
-# OPad docs, synced from the OPad repository by scripts/sync-docs.mjs
-src/content/docs/docs/
-src/content/docs/es/docs/
+# shallow clone of the OPad repository (scripts/opad-repo.mjs)
+.cache/
 
 # local Claude Code settings
 .claude/settings.local.json

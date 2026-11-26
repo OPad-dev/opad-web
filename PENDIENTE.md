@@ -54,7 +54,7 @@ Lo que más convence de este producto es ver la pantalla reaccionando mientras s
 Falta una sección corta con lo que un jugador quiere saber antes de comprar, sin tecnicismos:
 
 - [ ] Medidas (la carcasa mide 84 × 82,5 mm) y peso.
-- [ ] Qué viene en la caja y qué cable usa (USB-C).
+- [ ] Qué viene en la caja. Confirmado: incluye cable USB-C.
 - [ ] Con qué funciona: Windows y Linux. ¿Y macOS? Hay que confirmarlo.
 - [ ] Preguntas frecuentes: ¿necesito la app para jugar?, ¿funciona en osu!lazer y en stable?,
   ¿se pueden cambiar las teclas?, ¿es legal en torneos?

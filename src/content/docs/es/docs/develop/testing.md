@@ -1,0 +1,53 @@
+---
+editUrl: https://github.com/OPad-dev/OPad/edit/main/docs/es/develop/testing.md
+lastUpdated: 2026-11-23T20:46:16+01:00
+title: Pruebas y control de calidad
+description: Cómo ejecutar make check, las pruebas de Cargo del escritorio, las 28 pruebas unitarias del firmware en anfitrión, las comprobaciones de CI y la lista manual de verificación en hardware.
+sidebar:
+  order: 3
+---
+
+OPad verifica los cambios en cuatro capas: `make check` local, 28 pruebas unitarias en C compiladas en anfitrión para la lógica del firmware, CI en GitHub Actions y verificación manual en hardware ([/AGENTS.md](https://github.com/OPad-dev/OPad/blob/main/AGENTS.md) §4, [/Makefile](https://github.com/OPad-dev/OPad/blob/main/Makefile)).
+
+## Puerta local principal (`make check`)
+
+Ejecuta antes de dar cualquier cambio por terminado:
+```bash
+make check
+```
+En [/Makefile](https://github.com/OPad-dev/OPad/blob/main/Makefile), `make check` ejecuta:
+1. `cargo fmt --check` (formato en todo el espacio de trabajo `desktop/`)
+2. `cargo clippy --all-targets -- -D warnings` (advertencias prohibidas)
+3. `cargo test --workspace` (pruebas unitarias y de integración en todos los crates de escritorio, daemon, GUI y CLI)
+4. `./firmware/test/host/run_tests.sh` (las 28 suites de pruebas unitarias en anfitrión del firmware)
+
+## Pruebas unitarias del firmware en anfitrión (`run_tests.sh`)
+
+Los módulos C independientes del hardware se compilan con `gcc -Wall -Wextra -Werror` y se ejecutan directamente en el anfitrión mediante [/firmware/test/host/run_tests.sh](https://github.com/OPad-dev/OPad/blob/main/firmware/test/host/run_tests.sh):
+
+```bash
+./firmware/test/host/run_tests.sh
+```
+
+El script ejecuta **28** suites de pruebas que cubren:
+- **Entrada y mecánico**: `test_debounce`, `test_press_log`, `test_keypad_staged`, `test_game_keys`, `test_module_id`, `test_module_watch`
+- **Hall Effect y ADS7028**: `test_he_rt`, `test_he_frame`, `test_he_cal`, `test_he_cal_capture`, `test_he_health`, `test_he_cal_button`, `test_he_cal_runner`, `test_he_cal_sampling`, `test_he_cal_storage`, `test_he_cal_touch_guard`, `test_he_cal_barrier`, `test_ads7028`, `test_he_spi_frame`
+- **Táctil y USB**: `test_gesture`, `test_swipe_labels`, `test_usb_report_barrier`
+- **Almacenamiento, configuración, protocolo y diagnóstico**: `test_counters`, `test_config` (más `-DCONFIG_OPAD_BENCH_DEBUG_GPIO=1`), `test_diag`, `test_frame_parser`, `test_owner`, `test_nvs_ns`
+
+## Integración continua (CI)
+
+Todas las comprobaciones están en [/scripts/ci/jobs.sh](https://github.com/OPad-dev/OPad/blob/main/scripts/ci/jobs.sh) (trabajos de Linux) y [/scripts/ci/jobs.ps1](https://github.com/OPad-dev/OPad/blob/main/scripts/ci/jobs.ps1) (trabajos de Windows). Se ejecutan en dos sitios:
+
+- **El laboratorio, antes de cada push de `main`**: [/scripts/ci/lab-ci.sh](https://github.com/OPad-dev/OPad/blob/main/scripts/ci/lab-ci.sh) (`make push`, o `make lab-ci` sin hacer push) copia el commit al mini PC y ejecuta los trabajos de Linux en su VM `ci-linux` ([/scripts/ci/provision-linux.sh](https://github.com/OPad-dev/OPad/blob/main/scripts/ci/provision-linux.sh)) y los de Windows en el propio mini PC, con el checkout CRLF de Git para Windows. Si pasan todos, registra el commit, y el hook de pre-push ([/scripts/git-hooks/pre-push](https://github.com/OPad-dev/OPad/blob/main/scripts/git-hooks/pre-push), que instala `make hooks`) solo deja hacer push a `main` de un commit registrado.
+- **GitHub Actions** ([/.github/workflows/ci.yml](https://github.com/OPad-dev/OPad/blob/main/.github/workflows/ci.yml)), que no se ejecuta en los push: en los pull requests, a mano (`gh workflow run ci.yml --ref <rama>`) y antes de cada versión, porque al mergear un PR de versión [/.github/workflows/release-please.yml](https://github.com/OPad-dev/OPad/blob/main/.github/workflows/release-please.yml) lo lanza y la versión solo se compila si pasa.
+
+Además de `make check`, los trabajos ejecutan:
+- Compilación y pruebas MSVC en Windows (con la GUI en un trabajo separado).
+- Regeneración de protobuf mediante [/scripts/gen_proto.sh](https://github.com/OPad-dev/OPad/blob/main/scripts/gen_proto.sh) (falla si los archivos generados `opad.pb.c/.h` difieren).
+- Compilación del firmware ESP32-S3 en el contenedor `espressif/idf:v5.5.2`.
+- Comprobaciones de licencias y dependencias: cumplimiento REUSE ([/scripts/check_reuse.py](https://github.com/OPad-dev/OPad/blob/main/scripts/check_reuse.py)), `cargo-deny` y verificación de avisos de terceros.
+
+## Lista manual de verificación en hardware
+
+Los cambios que afecten a `firmware/main/input/`, `firmware/main/usb/`, al manejo de la pantalla táctil o al renderizado de pantalla deben probarse en un teclado real usando [la lista de verificación de pruebas](https://github.com/OPad-dev/OPad/blob/main/docs/es/testing-checklist.md) ([/AGENTS.md](https://github.com/OPad-dev/OPad/blob/main/AGENTS.md) §2, §4). Informa siempre con claridad si no había hardware conectado y se omitieron pruebas.

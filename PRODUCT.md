@@ -13,7 +13,7 @@ Astro + Starlight (chosen earlier in this repo; the user delegated the rest). St
 - **People who already own one.** They come for the desktop app download, firmware updates and the documentation.
 
 ## Product Purpose
-OPad is a two-key osu! keypad built on the Waveshare ESP32-S3-Touch-LCD-2. It is a plain 1000 Hz USB HID keyboard that works with nothing installed, on Linux and Windows 10/11. Its 2" touchscreen is a third button (Quick Retry during a map, swipes for volume and tracks outside one) and, with the optional desktop app and tosu, shows live play data (PP, accuracy, combo, KPS…) in layouts the user designs.
+OPad is a three-key osu! keypad built on the Waveshare ESP32-S3-Touch-LCD-2 (osu! plays with two keys; the third is there for play style). It is a plain 1000 Hz USB HID keyboard that works with nothing installed, on Linux and Windows 10/11. Its 2" touchscreen is a fourth button (Quick Retry during a map, swipes for volume and tracks outside one) and, with the optional desktop app and tosu, shows live play data (PP, accuracy, combo, KPS…) in layouts the user designs.
 
 Success for the site: a visitor understands what OPad is in one screen, players want one, builders reach the build guide, owners reach the download and docs.
 
