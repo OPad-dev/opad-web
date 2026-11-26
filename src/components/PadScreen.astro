@@ -1,0 +1,169 @@
+---
+/**
+ * One of the pad's screens, drawn widget by widget the way ui_screen.c builds it.
+ * Text that the page script updates carries data-src (and its label/suffix).
+ */
+import { LINE_HEIGHT, contrastText, format, grade, keyOf, keyRateSource, type Layout, type Values, type Widget } from '../lib/pad';
+
+interface Props {
+	layout: Layout;
+	values: Values;
+	name: 'idle' | 'playing';
+}
+const { layout, values, name } = Astro.props;
+
+const anchor = { left: 'start', center: 'middle', right: 'end' } as const;
+const textX = (w: Widget, pad = 0) => (w.align === 'center' ? w.x + w.w / 2 : w.align === 'right' ? w.x + w.w - pad : w.x + pad);
+const text = (w: Widget) => `${w.label ?? ''}${format(w.source, values[w.source], w.perSecond)}${w.suffix ?? ''}`;
+const line = (w: Widget) => LINE_HEIGHT[w.font ?? 14];
+---
+
+<g class="screen" data-screen={name} style={`--screen-bg:${layout.background}`}>
+	<rect width="320" height="240" fill={layout.background}></rect>
+	{
+		layout.widgets.map((w) => {
+			if (w.kind === 'rect') {
+				return (
+					<rect
+						x={w.x + 0.5}
+						y={w.y + 0.5}
+						width={w.w - 1}
+						height={w.h - 1}
+						rx={w.radius}
+						fill={w.bg}
+						stroke={w.border ? w.fg : 'none'}
+					/>
+				);
+			}
+			if (w.kind === 'progress') {
+				const v = Number(values[w.source] ?? 0);
+				return (
+					<g data-progress={w.source}>
+						<rect x={w.x} y={w.y} width={w.w} height={w.h} rx={w.radius} fill={w.bg} />
+						<rect x={w.x} y={w.y} width={w.w * v} height={w.h} rx={w.radius} fill={w.accent} data-fill />
+					</g>
+				);
+			}
+			if (w.kind === 'status') {
+				const dot = Math.max(6, line(w) / 2);
+				const on = Number(values[w.source]) === 1;
+				return (
+					<g>
+						<circle cx={w.x + dot / 2} cy={w.y + w.h / 2} r={dot / 2} fill={on ? w.accent : w.bg} />
+						<text x={w.x + dot + 5} y={w.y + w.h / 2} font-size={w.font} fill={w.fg} dominant-baseline="central">
+							{`${w.label ?? ''}${w.suffix ?? ''}`}
+						</text>
+					</g>
+				);
+			}
+			if (w.kind === 'grade') {
+				const g = grade(String(values[w.source] ?? ''));
+				return (
+					<text x={textX(w)} y={w.y + w.h / 2} font-size={w.font} fill={g.color} text-anchor={anchor[w.align ?? 'center']} dominant-baseline="central" font-weight="500">
+						{`${w.label ?? ''}${g.shown}${w.suffix ?? ''}`}
+					</text>
+				);
+			}
+			if (w.kind === 'keycard') {
+				const key = keyOf(w.source);
+				const rate = w.keyRate ? keyRateSource(w.source) : 'none';
+				const showRate = rate !== 'none' && values[rate] !== undefined;
+				return (
+					<g
+						class="keycard"
+						data-key={key}
+						style={`--kc-bg:${w.bg};--kc-fg:${w.fg};--kc-accent:${w.accent};--kc-down-fg:${contrastText(w.accent ?? '#000')}`}
+					>
+						<rect x={w.x + 0.5} y={w.y + 0.5} width={w.w - 1} height={w.h - 1} rx={w.radius} class="kc-card" />
+						<text
+							x={showRate ? w.x + 10 : w.x + w.w / 2}
+							y={w.y + 3 + LINE_HEIGHT[14] / 2}
+							font-size="14"
+							text-anchor={showRate ? 'start' : 'middle'}
+							dominant-baseline="central"
+							class="kc-text kc-title"
+						>
+							{w.label}
+						</text>
+						<text
+							x={w.x + w.w / 2}
+							y={w.y + w.h / 2 + (w.h >= 48 ? 8 : 0)}
+							font-size={w.font}
+							text-anchor="middle"
+							dominant-baseline="central"
+							class="kc-text"
+							data-src={w.source}
+						>
+							{format(w.source, values[w.source])}
+						</text>
+						{showRate && (
+							<text
+								x={w.x + w.w - 10}
+								y={w.y + 2 + LINE_HEIGHT[16] / 2}
+								font-size="16"
+								text-anchor="end"
+								dominant-baseline="central"
+								class="kc-text"
+								data-src={rate}
+								data-per-second={w.perSecond ? '' : undefined}
+								data-suffix={w.perSecond ? ' KPS' : ' KPM'}
+							>
+								{`${format(rate, values[rate], w.perSecond)}${w.perSecond ? ' KPS' : ' KPM'}`}
+							</text>
+						)}
+					</g>
+				);
+			}
+			// Text: optional filled/bordered box, label vertically centred in it.
+			const boxed = w.fill || w.border;
+			const pad = boxed ? (w.radius ?? 0) / 2 + 2 : 0;
+			return (
+				<g>
+					{boxed && (
+						<rect x={w.x} y={w.y} width={w.w} height={w.h} rx={w.radius} fill={w.fill ? w.bg : 'none'} stroke={w.border ? w.fg : 'none'} />
+					)}
+					<text
+						x={textX(w, pad)}
+						y={w.y + w.h / 2}
+						font-size={w.font}
+						fill={w.fg}
+						text-anchor={anchor[w.align ?? 'left']}
+						dominant-baseline="central"
+						data-src={w.source === 'none' ? undefined : w.source}
+						data-label={w.label}
+						data-suffix={w.suffix}
+						data-per-second={w.perSecond ? '' : undefined}
+					>
+						{text(w)}
+					</text>
+				</g>
+			);
+		})
+	}
+</g>
+
+<style>
+	.screen text {
+		font-family: var(--font-sans);
+		font-weight: 500;
+	}
+	/* Key cards swap bg and accent while the key is held, instantly, like LV_STATE_CHECKED. */
+	.kc-card {
+		fill: var(--kc-bg);
+		stroke: var(--kc-accent);
+		stroke-opacity: 0.5;
+	}
+	.kc-text {
+		fill: var(--kc-fg);
+	}
+	.kc-title {
+		fill-opacity: 0.7;
+	}
+	.keycard.is-down .kc-card {
+		fill: var(--kc-accent);
+		stroke: var(--kc-bg);
+	}
+	.keycard.is-down .kc-text {
+		fill: var(--kc-down-fg);
+	}
+</style>

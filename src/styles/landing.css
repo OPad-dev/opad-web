@@ -1,0 +1,495 @@
+/* Landing page. Tokens: tokens.css (the app's palette). */
+@layer base, page;
+
+@layer base {
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+	html {
+		background: var(--bg);
+		color: var(--text);
+		font-family: var(--font-sans);
+		font-weight: 400;
+		line-height: 1.6;
+		color-scheme: dark;
+		scrollbar-color: var(--off) var(--bg);
+		-webkit-text-size-adjust: 100%;
+	}
+	body {
+		margin: 0;
+		min-block-size: 100dvh;
+	}
+	h1,
+	h2,
+	h3 {
+		font-weight: 700;
+		line-height: 1.12;
+		text-wrap: balance;
+		margin: 0;
+	}
+	p {
+		margin: 0;
+		text-wrap: pretty;
+	}
+	a {
+		color: inherit;
+	}
+	::selection {
+		background: var(--pink);
+		color: var(--bg);
+	}
+	:focus-visible {
+		outline: 2px solid var(--pink);
+		outline-offset: 3px;
+		border-radius: 4px;
+	}
+	.visually-hidden {
+		position: absolute;
+		inline-size: 1px;
+		block-size: 1px;
+		margin: -1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+	}
+}
+
+@layer page {
+	.skip {
+		position: absolute;
+		inset-inline-start: var(--space-4);
+		inset-block-start: -4rem;
+		z-index: 20;
+		padding: var(--space-2) var(--space-4);
+		background: var(--pink);
+		color: var(--bg);
+		border-radius: var(--radius-control);
+		font-weight: 700;
+		&:focus {
+			inset-block-start: var(--space-4);
+		}
+	}
+
+	/* The map's progress bar: the page is a map, scroll is how far into it you are. */
+	/* Header */
+	.site-header {
+		position: sticky;
+		inset-block-start: 0;
+		z-index: 10;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-4);
+		block-size: 4.5rem;
+		padding-inline: clamp(var(--space-4), 4vw, var(--space-7));
+		background: var(--bg);
+		border-block-end: 1px solid var(--border);
+		& ul {
+			display: flex;
+			align-items: center;
+			gap: clamp(var(--space-1), 1.5vw, var(--space-3));
+			margin: 0;
+			padding: 0;
+			list-style: none;
+		}
+		& nav a {
+			display: inline-flex;
+			align-items: center;
+			min-block-size: 2.75rem;
+			padding-inline: var(--space-3);
+			border-radius: var(--radius-control);
+			color: var(--muted);
+			font-weight: 500;
+			font-size: 0.9375rem;
+			text-decoration: none;
+			transition:
+				color 150ms ease,
+				background-color 150ms ease;
+		}
+		& nav a:hover {
+			color: var(--text);
+			background: var(--card);
+		}
+		& .icon-link {
+			min-inline-size: 2.75rem;
+			justify-content: center;
+			padding-inline: 0;
+		}
+		& .icon-link .icon {
+			inline-size: 1.375rem;
+			block-size: 1.375rem;
+		}
+		& .lang {
+			border: 1px solid var(--border);
+			font-size: 0.8125rem;
+			letter-spacing: 0.04em;
+		}
+	}
+	.wordmark {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-3);
+		font-weight: 700;
+		font-size: 1.375rem;
+		letter-spacing: -0.01em;
+		text-decoration: none;
+		& .mark {
+			display: block;
+			inline-size: 2.25rem;
+		}
+		& .mark svg {
+			display: block;
+			inline-size: 100%;
+			block-size: auto;
+		}
+	}
+
+	/* Buttons: the app's controls (radius 10, pink primary with dark text). */
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: var(--space-2);
+		min-block-size: 3rem;
+		padding: var(--space-2) var(--space-5);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-control);
+		background: var(--card);
+		color: var(--text);
+		font: 500 1rem / 1.2 var(--font-sans);
+		text-decoration: none;
+		cursor: pointer;
+		transition:
+			background-color 150ms ease,
+			border-color 150ms ease,
+			scale 120ms var(--ease-out);
+		&:hover {
+			background: var(--card-hover);
+		}
+		&:active {
+			scale: 0.97;
+		}
+	}
+	.btn-primary {
+		background: var(--pink);
+		border-color: var(--pink);
+		color: var(--bg);
+		font-weight: 700;
+		&:hover {
+			background: var(--pink-hover);
+			border-color: var(--pink-hover);
+		}
+	}
+	.more {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
+		min-block-size: 2.75rem;
+		color: var(--pink);
+		font-weight: 500;
+		text-decoration: none;
+		& .icon {
+			transition: translate 150ms var(--ease-out);
+		}
+		&:hover .icon {
+			translate: 0.2rem 0;
+		}
+		&:hover {
+			text-decoration: underline;
+			text-underline-offset: 0.25em;
+		}
+	}
+
+	/* Hero: the promise, then the keypad itself, centred like a product shot. */
+	.hero {
+		display: grid;
+		justify-items: center;
+		gap: var(--space-7);
+		max-inline-size: 90rem;
+		margin-inline: auto;
+		padding: var(--space-7) clamp(var(--space-4), 5vw, var(--space-8)) var(--space-9);
+		text-align: center;
+		& .case3d,
+		& .case-still {
+			max-inline-size: 52rem;
+		}
+	}
+	.hero-text {
+		display: grid;
+		justify-items: center;
+		gap: var(--space-5);
+		& h1 {
+			font-size: clamp(2.5rem, 4.6vw, 4rem);
+			letter-spacing: -0.03em;
+			max-inline-size: 16ch;
+			text-wrap: balance;
+		}
+		& .lede {
+			font-size: clamp(1.0625rem, 1.3vw, 1.25rem);
+			color: var(--muted);
+			max-inline-size: 44ch;
+		}
+		& .actions {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			gap: var(--space-3);
+			margin-block-start: var(--space-2);
+		}
+	}
+	.availability {
+		color: var(--muted);
+		font-size: 0.9375rem;
+		text-wrap: balance;
+		& .dot {
+			display: inline-block;
+			inline-size: 0.5rem;
+			block-size: 0.5rem;
+			margin-inline-end: var(--space-2);
+			border-radius: 50%;
+			background: var(--yellow);
+			translate: 0 -0.1rem;
+		}
+	}
+
+	.hero-text .h1 {
+		font-weight: 700;
+		line-height: 1.12;
+		font-size: clamp(2.5rem, 4.6vw, 4rem);
+		letter-spacing: -0.03em;
+		max-inline-size: 16ch;
+		text-wrap: balance;
+	}
+	.hero-alt {
+		border-block-start: 2px dashed var(--yellow);
+	}
+	.case-still {
+		display: block;
+		inline-size: 100%;
+		block-size: auto;
+	}
+
+	/* Temporary: labels the two hero options while one is chosen. */
+	.option-tag {
+		margin-block-end: calc(var(--space-6) * -1);
+		padding: 0.2rem 0.75rem;
+		border: 1px dashed var(--yellow);
+		border-radius: 999px;
+		color: var(--yellow);
+		font-size: 0.8125rem;
+		font-weight: 500;
+	}
+
+	/* Your play, live: the screen during a map. */
+	.live {
+		display: grid;
+		grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+		align-items: center;
+		gap: clamp(var(--space-6), 5vw, var(--space-9));
+		& h2 {
+			font-size: clamp(1.875rem, 3vw, 2.75rem);
+			letter-spacing: -0.02em;
+		}
+		& .live-text {
+			display: grid;
+			gap: var(--space-4);
+		}
+		& .live-text p {
+			font-size: 1.1875rem;
+			max-inline-size: 40ch;
+		}
+		& .live-text .note {
+			color: var(--muted);
+			font-size: 1rem;
+		}
+	}
+	.live-screen {
+		margin: 0;
+		padding: 0.75rem;
+		background: #06060b;
+		border: 1px solid var(--border);
+		border-radius: var(--radius-card);
+		& svg {
+			display: block;
+			inline-size: 100%;
+			block-size: auto;
+		}
+	}
+
+	/* Full-width bands. */
+	.band {
+		max-inline-size: 90rem;
+		margin-inline: auto;
+		padding: var(--space-9) clamp(var(--space-4), 5vw, var(--space-8));
+		border-block-start: 1px solid var(--border);
+		& > h2 {
+			font-size: clamp(1.875rem, 3vw, 2.75rem);
+			letter-spacing: -0.02em;
+			margin-block-end: var(--space-7);
+		}
+	}
+	.features ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: var(--space-7) var(--space-6);
+		& li {
+			display: grid;
+			align-content: start;
+			gap: var(--space-3);
+			padding-block-start: var(--space-4);
+			border-block-start: 2px solid var(--off);
+		}
+		& h3 {
+			font-size: 1.125rem;
+		}
+		& p {
+			color: var(--muted);
+		}
+	}
+
+	.paths {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) minmax(0, 1fr);
+		gap: var(--space-4);
+		align-items: stretch;
+	}
+	.path-card {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-4);
+		padding: var(--space-6);
+		background: var(--card);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-card);
+		& h3 {
+			display: flex;
+			align-items: center;
+			flex-wrap: wrap;
+			gap: var(--space-3);
+			font-size: 1.25rem;
+		}
+		& h3 .icon {
+			color: var(--muted);
+		}
+		& p {
+			color: var(--muted);
+			flex: 1;
+		}
+		& .actions {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--space-2) var(--space-5);
+		}
+		& > .btn {
+			align-self: start;
+		}
+	}
+	/* Build one is the way to get an OPad today: the app's pink-outlined card. */
+	.path-card.build {
+		border-color: color-mix(in srgb, var(--pink) 50%, transparent);
+		& h3 .icon {
+			color: var(--pink);
+		}
+	}
+	.status {
+		padding: 0.15rem 0.6rem;
+		border: 1px solid var(--border);
+		border-radius: 999px;
+		color: var(--yellow);
+		font-size: 0.8125rem;
+		font-weight: 500;
+	}
+
+	.site-footer {
+		max-inline-size: 90rem;
+		margin-inline: auto;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--space-4) var(--space-7);
+		padding: var(--space-7) clamp(var(--space-4), 5vw, var(--space-8)) var(--space-8);
+		border-block-start: 1px solid var(--border);
+		color: var(--muted);
+		font-size: 0.9375rem;
+		& .wordmark {
+			color: var(--text);
+			font-size: 1.125rem;
+		}
+		& .wordmark .mark {
+			inline-size: 1.75rem;
+		}
+		& ul {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--space-2) var(--space-5);
+			margin: 0 0 0 auto;
+			padding: 0;
+			list-style: none;
+		}
+		& ul a {
+			display: inline-flex;
+			align-items: center;
+			min-block-size: 2.75rem;
+			text-decoration: none;
+		}
+		& ul a:hover {
+			color: var(--text);
+		}
+	}
+
+	/* Below desktop: one column, the pad right after the headline. */
+	@media (width < 64rem) {
+		.live {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.features ul {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+		.paths {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.band {
+			padding-block: var(--space-8);
+		}
+	}
+	@media (width < 40rem) {
+		.hide-narrow {
+			display: none;
+		}
+		.hero {
+			gap: var(--space-6);
+			padding-block: var(--space-6) var(--space-8);
+		}
+		.hero-text h1 {
+			font-size: clamp(2rem, 8.5vw, 2.75rem);
+		}
+		.hero-text .lede {
+			font-size: 1rem;
+		}
+		.availability {
+			font-size: 0.875rem;
+		}
+		.features ul {
+			grid-template-columns: minmax(0, 1fr);
+			gap: var(--space-5);
+		}
+		.path-card {
+			padding: var(--space-5);
+		}
+		.site-footer ul {
+			margin-inline-start: 0;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.btn,
+		.more .icon {
+			transition-duration: 0ms;
+		}
+	}
+}

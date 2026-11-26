@@ -1,0 +1,188 @@
+---
+import { Font, Image } from 'astro:assets';
+import caseStill from '../assets/opad-case.png';
+import Case3D from './Case3D.astro';
+import Icon from './Icon.astro';
+import PadScreen from './PadScreen.astro';
+import { PLAYING, SAMPLE } from '../lib/pad';
+import mark from '../assets/opad-mark.svg?raw';
+import { links, t, type Lang } from '../i18n/landing';
+import '../styles/tokens.css';
+import '../styles/landing.css';
+
+interface Props {
+	lang: Lang;
+}
+const { lang } = Astro.props;
+const s = t[lang];
+const other: Lang = lang === 'en' ? 'es' : 'en';
+const url = (path: string) => new URL(path, Astro.site).href;
+---
+
+<!doctype html>
+<html lang={lang}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{s.meta.title}</title>
+		<meta name="description" content={s.meta.description} />
+		<link rel="canonical" href={url(links.home[lang])} />
+		<link rel="alternate" hreflang="en" href={url(links.home.en)} />
+		<link rel="alternate" hreflang="es" href={url(links.home.es)} />
+		<link rel="alternate" hreflang="x-default" href={url(links.home.en)} />
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<meta name="theme-color" content="#0e0e16" />
+		<meta name="color-scheme" content="dark" />
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content={s.meta.title} />
+		<meta property="og:description" content={s.meta.description} />
+		<meta property="og:url" content={url(links.home[lang])} />
+		<meta property="og:locale" content={lang === 'en' ? 'en_US' : 'es_ES'} />
+		<Font cssVariable="--font-sans" preload={[{ weight: '500', style: 'normal', subset: 'latin' }, { weight: '700', style: 'normal', subset: 'latin' }]} />
+		<Font cssVariable="--font-mono" />
+	</head>
+	<body>
+		<a class="skip" href="#content">{s.skip}</a>
+
+		<header class="site-header">
+			<a class="wordmark" href={links.home[lang]} aria-label="OPad">
+				<span class="mark" set:html={mark} />
+				<span>OPad</span>
+			</a>
+			<nav aria-label="Main">
+				<ul>
+					<li><a href={links.docs[lang]}>{s.nav.docs}</a></li>
+					<li class="hide-narrow"><a href={links.releases}>{s.nav.download}</a></li>
+					<li>
+						<a class="icon-link" href={links.repo} aria-label={s.nav.github}><Icon name="github" /></a>
+					</li>
+					<li>
+						<a class="lang" href={links.home[other]} hreflang={other} lang={other}>
+							<span aria-hidden="true">{other.toUpperCase()}</span>
+							<span class="visually-hidden">{s.footer.switchTo}</span>
+						</a>
+					</li>
+				</ul>
+			</nav>
+		</header>
+
+		<main id="content">
+			<section class="hero" aria-labelledby="hero-title">
+				<div class="hero-text">
+					<h1 id="hero-title">{s.hero.title}</h1>
+					<p class="lede">{s.hero.lede}</p>
+					<div class="actions">
+						<a class="btn btn-primary" href="#get">
+							{s.hero.primary}
+							<Icon name="arrow-right" />
+						</a>
+						<a class="btn" href="#live">{s.hero.secondary}</a>
+					</div>
+					<p class="availability">
+						<span class="dot" aria-hidden="true"></span>
+						{s.hero.availability}
+					</p>
+				</div>
+				<p class="option-tag">Opción 1 · 3D interactivo</p>
+				<Case3D lang={lang} />
+			</section>
+
+			<!-- Temporary: option 2, the same hero with a still image, to compare. -->
+			<section class="hero hero-alt" aria-label="Opción 2">
+				<div class="hero-text">
+					<p class="h1" aria-hidden="true">{s.hero.title}</p>
+					<p class="lede">{s.hero.lede}</p>
+					<div class="actions">
+						<a class="btn btn-primary" href="#get">
+							{s.hero.primary}
+							<Icon name="arrow-right" />
+						</a>
+						<a class="btn" href="#live">{s.hero.secondary}</a>
+					</div>
+					<p class="availability">
+						<span class="dot" aria-hidden="true"></span>
+						{s.hero.availability}
+					</p>
+				</div>
+				<p class="option-tag">Opción 2 · Imagen estática</p>
+				<Image
+					class="case-still"
+					src={caseStill}
+					alt={s.pad.label}
+					widths={[480, 832, 1248, 1664]}
+					sizes="(width < 56rem) 100vw, 52rem"
+					format="webp"
+					quality={82}
+				/>
+			</section>
+
+			<section class="band live" id="live" aria-labelledby="live-title">
+				<div class="live-text">
+					<h2 id="live-title">{s.live.title}</h2>
+					<p>{s.live.body}</p>
+					<p class="note">{s.live.note}</p>
+				</div>
+				<figure class="live-screen">
+					<svg viewBox="0 0 320 240" role="img" aria-label={s.live.label} data-live>
+						<PadScreen layout={PLAYING} values={SAMPLE} name="playing" />
+					</svg>
+				</figure>
+			</section>
+
+			<section class="band features" aria-labelledby="features-title">
+				<h2 id="features-title">{s.features.title}</h2>
+				<ul>
+					{
+						s.features.items.map((item) => (
+							<li>
+								<h3>{item.name}</h3>
+								<p>{item.body}</p>
+							</li>
+						))
+					}
+				</ul>
+			</section>
+
+			<section class="band get" id="get" aria-labelledby="get-title">
+				<h2 id="get-title">{s.get.title}</h2>
+				<div class="paths">
+					<article class="path-card kickstarter">
+						<h3>
+							<Icon name="bell" />
+							{s.get.kickstarter.name}
+							<span class="status">{s.get.kickstarter.status}</span>
+						</h3>
+						<p>{s.get.kickstarter.body}</p>
+						<a class="btn" href={links.repo}>
+							<Icon name="github" />
+							{s.get.kickstarter.action}
+						</a>
+					</article>
+					<article class="path-card build">
+						<h3><Icon name="wrench" />{s.get.build.name}</h3>
+						<p>{s.get.build.body}</p>
+						<a class="btn btn-primary" href={links.whatYouNeed[lang]}>{s.get.build.action}<Icon name="arrow-right" /></a>
+					</article>
+					<article class="path-card own">
+						<h3><Icon name="download" />{s.get.own.name}</h3>
+						<p>{s.get.own.body}</p>
+						<a class="btn" href={links.releases}>{s.get.own.action}</a>
+					</article>
+				</div>
+			</section>
+		</main>
+
+		<footer class="site-footer">
+			<a class="wordmark" href={links.home[lang]} aria-label="OPad">
+				<span class="mark" set:html={mark} />
+				<span>OPad</span>
+			</a>
+			<p>{s.footer.licence}</p>
+			<ul>
+				<li><a href={links.docs[lang]}>{s.footer.docs}</a></li>
+				<li><a href={links.repo}>{s.footer.source}</a></li>
+				<li><a href={links.home[other]} hreflang={other} lang={other}>{s.footer.switchTo}</a></li>
+			</ul>
+		</footer>
+	</body>
+</html>

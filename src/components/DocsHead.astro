@@ -1,0 +1,43 @@
+---
+import Default from '@astrojs/starlight/components/Head.astro';
+import { Font } from 'astro:assets';
+---
+
+<Default><slot /></Default>
+<Font cssVariable="--font-sans" preload={[{ weight: '400', style: 'normal', subset: 'latin' }]} />
+<Font cssVariable="--font-mono" />
+<script>
+	// Mermaid diagrams (synced from the docs as <pre class="mermaid">): load the renderer only where one exists.
+	const diagrams = document.querySelectorAll<HTMLElement>('pre.mermaid');
+	if (diagrams.length) {
+		import('mermaid').then(({ default: mermaid }) => {
+			const css = getComputedStyle(document.documentElement);
+			const v = (name: string) => css.getPropertyValue(name).trim();
+			const dark = document.documentElement.dataset.theme !== 'light';
+			mermaid.initialize({
+				startOnLoad: false,
+				// Natural size, scrolling sideways when wide: scaled-down diagrams become unreadable.
+				flowchart: { useMaxWidth: false },
+				sequence: { useMaxWidth: false },
+				state: { useMaxWidth: false },
+				class: { useMaxWidth: false },
+				theme: 'base',
+				fontFamily: v('--font-sans') || 'sans-serif',
+				themeVariables: {
+					darkMode: dark,
+					background: v('--sl-color-bg'),
+					primaryColor: v('--sl-color-bg-nav'),
+					primaryBorderColor: v('--sl-color-accent'),
+					primaryTextColor: v('--sl-color-white'),
+					secondaryColor: v('--sl-color-gray-6'),
+					tertiaryColor: v('--sl-color-gray-6'),
+					lineColor: v('--sl-color-gray-3'),
+					textColor: v('--sl-color-white'),
+					noteBkgColor: v('--sl-color-gray-6'),
+					noteTextColor: v('--sl-color-white'),
+				},
+			});
+			mermaid.run({ nodes: diagrams });
+		});
+	}
+</script>

@@ -1,0 +1,107 @@
+---
+/**
+ * Option 1: the real OPad case in 3D, from the OPad repository's case model
+ * (public/models, via scripts/sync-model.mjs), with keycaps and the screen added at the
+ * model's own measurements. The screen shows the firmware's Idle layout and follows the
+ * keys. Drag to turn it; Z, X, C or a tap on a key presses it.
+ */
+import PadScreen from './PadScreen.astro';
+import { IDLE, SAMPLE } from '../lib/pad';
+import { t, type Lang } from '../i18n/landing';
+
+interface Props {
+	lang: Lang;
+}
+const { lang } = Astro.props;
+const s = t[lang].pad;
+---
+
+<figure class="case3d" data-case3d aria-label={s.label}>
+	<div class="stage" data-stage></div>
+	<svg viewBox="0 0 320 240" class="texture-src" aria-hidden="true" data-live data-screen-texture>
+		<PadScreen layout={IDLE} values={SAMPLE} name="idle" />
+	</svg>
+	<figcaption class="pad-caption">
+		<span class="hint hint-keys"><kbd>Z</kbd> <kbd>X</kbd> <kbd>C</kbd> {s.hint}</span>
+		<span class="hint hint-touch">{s.hintTouch}</span>
+		<span class="sample">{s.sample}</span>
+	</figcaption>
+</figure>
+
+<script>
+	import '../lib/pad-live';
+
+	const figure = document.querySelector<HTMLElement>('[data-case3d]');
+	const start = () => import('../lib/case3d').then((m) => m.mount(figure!));
+	if (figure) {
+		if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 1500 });
+		else setTimeout(start, 200);
+	}
+</script>
+
+<style>
+	.case3d {
+		margin: 0;
+		display: grid;
+		justify-items: center;
+		gap: var(--space-3);
+		inline-size: 100%;
+	}
+	.stage {
+		position: relative;
+		inline-size: 100%;
+		aspect-ratio: 4 / 3;
+		touch-action: pan-y;
+		cursor: grab;
+		&:active {
+			cursor: grabbing;
+		}
+		& :global(canvas) {
+			display: block;
+			inline-size: 100%;
+			block-size: 100%;
+		}
+	}
+	/* The screen's source: drawn off screen, copied onto the 3D glass. */
+	.texture-src {
+		position: absolute;
+		inline-size: 320px;
+		block-size: 240px;
+		inset-inline-start: -10000px;
+		pointer-events: none;
+	}
+	.pad-caption {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: var(--space-2) var(--space-5);
+		color: var(--muted);
+		font-size: 0.875rem;
+	}
+	.hint {
+		color: var(--text);
+		font-weight: 500;
+	}
+	.hint-touch {
+		display: none;
+	}
+	@media (hover: none) and (pointer: coarse) {
+		.hint-keys {
+			display: none;
+		}
+		.hint-touch {
+			display: inline;
+		}
+	}
+	kbd {
+		display: inline-grid;
+		place-items: center;
+		min-inline-size: 1.6rem;
+		padding: 0.05rem 0.35rem;
+		border: 1px solid var(--border);
+		border-block-end-width: 2px;
+		border-radius: 6px;
+		background: var(--card);
+		font: 500 0.8125rem var(--font-mono);
+	}
+</style>

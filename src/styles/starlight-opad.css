@@ -1,0 +1,107 @@
+/* Starlight in the OPad app's colours (desktop/gui/src/theme.rs). Dark is the app; light is its daylight twin. */
+:root {
+	--sl-font: var(--font-sans);
+	--sl-font-mono: var(--font-mono);
+
+	--sl-color-accent-low: #3a1a2c;
+	--sl-color-accent: #ff66aa;
+	--sl-color-accent-high: #ffc2dc;
+	--sl-color-white: #ffffff;
+	--sl-color-gray-1: #e4e4ee;
+	--sl-color-gray-2: #c2c2d4;
+	--sl-color-gray-3: #8c8ca6;
+	--sl-color-gray-4: #5c5c74;
+	--sl-color-gray-5: #2a2a3c;
+	--sl-color-gray-6: #1b1b28;
+	--sl-color-black: #0e0e16;
+	--sl-color-bg-nav: #13131e;
+	--sl-color-bg-sidebar: #13131e;
+	--sl-color-hairline: #2a2a3c;
+	--sl-color-hairline-light: #2a2a3c;
+	--sl-color-hairline-shade: #0e0e16;
+	/* Links and the current page in the app's pink, not a paler tint. */
+	--sl-color-text-accent: var(--sl-color-accent);
+}
+
+:root[data-theme='light'] {
+	--sl-color-accent-low: #ffe0ee;
+	--sl-color-accent: #c2185b;
+	--sl-color-accent-high: #7a0f3a;
+	--sl-color-white: #0e0e16;
+	--sl-color-gray-1: #1b1b28;
+	--sl-color-gray-2: #2a2a3c;
+	--sl-color-gray-3: #55556b;
+	--sl-color-gray-4: #8c8ca6;
+	--sl-color-gray-5: #d4d4e0;
+	--sl-color-gray-6: #eeeef4;
+	--sl-color-gray-7: #f6f6fa;
+	--sl-color-black: #ffffff;
+	--sl-color-bg-nav: #f6f6fa;
+	--sl-color-bg-sidebar: #f6f6fa;
+	--sl-color-text-accent: var(--sl-color-accent);
+}
+
+::selection {
+	background: var(--sl-color-accent);
+	color: var(--sl-color-black);
+}
+
+:focus-visible {
+	outline: 2px solid var(--sl-color-accent);
+	outline-offset: 3px;
+}
+
+html {
+	scrollbar-color: var(--sl-color-gray-4) var(--sl-color-black);
+}
+
+.site-title {
+	color: var(--sl-color-white);
+	font-weight: 700;
+	gap: 0.6rem;
+}
+
+.sl-markdown-content :is(h1, h2, h3, h4),
+h1#_top {
+	font-weight: 700;
+	letter-spacing: -0.015em;
+	text-wrap: balance;
+}
+
+.sl-markdown-content a {
+	text-underline-offset: 0.22em;
+}
+
+.sl-markdown-content table {
+	font-variant-numeric: tabular-nums;
+}
+
+/* Cards and controls take the app's radii. */
+.sl-markdown-content :is(table, .expressive-code .frame),
+.starlight-aside {
+	border-radius: 14px;
+}
+.starlight-aside {
+	border: 1px solid var(--sl-color-asides-border);
+}
+
+/* Mermaid diagrams: the source stays readable until the renderer replaces it. */
+.sl-markdown-content pre.mermaid {
+	display: block;
+	text-align: center;
+	padding: 1.25rem;
+	overflow-x: auto;
+	background: var(--sl-color-gray-6);
+	border: 1px solid var(--sl-color-hairline);
+	border-radius: 14px;
+	font-size: 0.8125rem;
+	line-height: 1.4;
+}
+.sl-markdown-content pre.mermaid:not([data-processed]) {
+	text-align: start;
+	color: var(--sl-color-gray-3);
+	white-space: pre;
+}
+.sl-markdown-content pre.mermaid svg {
+	block-size: auto;
+}
