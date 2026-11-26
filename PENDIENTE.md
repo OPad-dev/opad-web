@@ -5,9 +5,9 @@ Está ordenada por impacto: lo de arriba es lo que más vende.
 
 ## 1. Una imagen del producto que venda
 
-La página principal muestra el OPad como modelo 3D interactivo, sacado del modelo real de la carcasa
-(se descartó la versión con imagen fija). Se ve "de videojuego": luz plana, plástico sin textura y teclas
-inventadas.
+La página principal muestra el OPad como modelo 3D interactivo, sacado del modelo real de la carcasa V4
+(negra de PETG, con las ranuras de los lados en azul claro; se descartó la versión con imagen fija). Aún se ve
+"de videojuego": plástico sin textura y teclas inventadas.
 
 Hay dos caminos (se pueden combinar):
 
@@ -62,10 +62,11 @@ Falta una sección corta con lo que un jugador quiere saber antes de comprar, si
 ## 6. Publicarla
 
 - [x] **Dominio.** `https://opad.dev`, configurado en `astro.config.mjs`.
-- [ ] **Alojamiento gratuito**: GitHub Pages o Cloudflare Pages.
-- [ ] **Construcción automática en GitHub.** La web copia la documentación y el modelo 3D del repositorio OPad al
-  construirse, así que el proceso automático tiene que descargar ese repositorio primero. Lo preparo cuando se
-  decida dónde se aloja.
+- [ ] **Alojamiento gratuito en GitHub Pages.** El workflow `.github/workflows/deploy.yml` ya construye y publica la
+  web en cada push, a diario y a mano. Falta: subirlo, activar Pages en el repositorio (Settings → Pages → Source:
+  GitHub Actions) y apuntar el DNS de `opad.dev` a GitHub Pages.
+- [ ] Opcional: que OPad avise a la web al cambiar `main` (un `repository_dispatch` de tipo `opad-updated`), para
+  no esperar a la construcción diaria. Necesita un token con permiso sobre `opad-web` guardado en OPad.
 
 ## 7. Repaso final (lo hago yo cuando lo anterior esté)
 
@@ -73,5 +74,5 @@ Falta una sección corta con lo que un jugador quiere saber antes de comprar, si
 - [ ] Escribir `DESIGN.md` con el sistema visual (colores, tipografía, componentes) para que futuros cambios sean
   coherentes.
 - [ ] Repaso de rendimiento: la portada a veces tarda en responder en móviles lentos y el modelo 3D pesa unos
-  290 KB.
+  650 KB.
 - [ ] Repaso de accesibilidad y de los textos en inglés y español.

@@ -1,19 +1,22 @@
 /**
- * The 3D OPad: the case model from the OPad repository (hardware/3d/custom_case),
+ * The 3D OPad: the V4 case model from the OPad repository (hardware/3d/custom_case/V4),
  * plus keycaps and the screen at the model's own measurements (opad_params.scad).
+ * The case is black PETG with light blue lines in the V-grooves along its side creases.
  * Units are millimetres, Z up, origin at the case's front-left bottom corner.
  * Renders on demand: a frame is drawn only when something changes.
  */
 import * as THREE from 'three';
 import { STLLoader } from 'three/addons/loaders/STLLoader.js';
-import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { toCreasedNormals } from 'three/addons/utils/BufferGeometryUtils.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { onChange, onKey, press, release, type Key } from './pad-live';
+import { CAP_REST, TRAVEL, keycapGeometry, switchGeometry } from './keys3d';
 
 // From opad_params.scad.
 const CASE_W = 84;
 const CASE_L = 82.5;
+// The top case's STL is exported for printing, BASE_T lower than where it sits on the plate.
+const BASE_T = 2;
 const KEY_X = [22.95, 42, 61.05];
 const KEY_Y = 16.5;
 const KEY_DECK_H = 11.6;
@@ -22,8 +25,8 @@ const GLASS = { x: 59.22, y: 37.52, y_c: 56.6861, z_c: 27.843 };
 // The 2-inch panel's active area (4:3), centred in the glass.
 const ACTIVE = { x: 40.8, y: 30.6 };
 
-// The app's colours (desktop/gui/src/theme.rs).
-const COLOR = { case: 0x202032, switch: 0x0b0b12, plate: 0x13131e, keycap: 0x2a2a3c, legend: '#ff66aa', glass: 0x050508 };
+// The case: black PETG with light blue creases. Keys and legends: the app's colours (desktop/gui/src/theme.rs).
+const COLOR = { case: 0x1c1c1e, crease: 0x5cc2ff, switch: 0x1c1c22, plate: 0x141416, keycap: 0x2a2a3c, legend: '#ff66aa', glass: 0x050508 };
 
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -47,11 +50,15 @@ export async function mount(figure: HTMLElement, opts: { still?: boolean } = {})
 	camera.position.set(0, 128, 182);
 	camera.lookAt(0, 8, 2);
 
-	const key = new THREE.DirectionalLight(0xffffff, 2.2);
+	// Studio lighting for matte plastic: a strong key from the upper left, a softer fill from
+	// the right and a rim from behind, so each facet of the case gets its own shade.
+	const key = new THREE.DirectionalLight(0xffffff, 4.2);
 	key.position.set(-120, 260, 160);
-	const rim = new THREE.DirectionalLight(0xffc2dc, 0.9);
-	rim.position.set(160, 80, -200);
-	scene.add(key, rim, new THREE.HemisphereLight(0xbfc3ff, 0x0e0e16, 0.5));
+	const fill = new THREE.DirectionalLight(0xffffff, 1.6);
+	fill.position.set(220, 90, 120);
+	const rim = new THREE.DirectionalLight(0xffffff, 2.2);
+	rim.position.set(60, 140, -220);
+	scene.add(key, fill, rim, new THREE.HemisphereLight(0xffffff, 0x0e0e10, 1.3));
 
 	// The model, in its own frame (mm, Z up), turned to Y up and centred.
 	const turntable = new THREE.Group();
@@ -62,16 +69,22 @@ export async function mount(figure: HTMLElement, opts: { still?: boolean } = {})
 	scene.add(turntable);
 
 	const loader = new STLLoader();
-	const caseMaterial = new THREE.MeshStandardMaterial({ color: COLOR.case, roughness: 0.62, metalness: 0 });
-	const plateMaterial = new THREE.MeshStandardMaterial({ color: COLOR.plate, roughness: 0.7 });
-	const [top, bottom] = await Promise.all(
-		['/models/case-top.stl', '/models/case-bottom.stl'].map((url) => loader.loadAsync(url)),
+	// Printed plastic is matte: every plastic part is purely diffuse (Lambert, no specular, no
+	// reflections), so the facets read only by how much light each one faces.
+	const caseMaterial = new THREE.MeshLambertMaterial({ color: COLOR.case });
+	const plateMaterial = new THREE.MeshLambertMaterial({ color: COLOR.plate });
+	const creaseMaterial = new THREE.MeshLambertMaterial({ color: COLOR.crease, emissive: COLOR.crease, emissiveIntensity: 0.12 });
+	const [top, crease, bottom] = await Promise.all(
+		['/models/case-top.stl', '/models/case-crease.stl', '/models/case-bottom.stl'].map((url) => loader.loadAsync(url)),
 	);
-	for (const [geometry, material] of [
-		[top, caseMaterial],
-		[bottom, plateMaterial],
+	for (const [geometry, material, z] of [
+		[top, caseMaterial, BASE_T],
+		[crease, creaseMaterial, BASE_T],
+		[bottom, plateMaterial, 0],
 	] as const) {
-		model.add(new THREE.Mesh(toCreasedNormals(geometry, THREE.MathUtils.degToRad(30)), material));
+		const mesh = new THREE.Mesh(toCreasedNormals(geometry, THREE.MathUtils.degToRad(30)), material);
+		mesh.position.z = z;
+		model.add(mesh);
 	}
 
 	// Soft contact shadow under the case.
@@ -92,42 +105,41 @@ export async function mount(figure: HTMLElement, opts: { still?: boolean } = {})
 		model.add(shadow);
 	}
 
-	// Keycaps: MX profile on the three switches, with the legends the keypad types.
+	// Switches and keycaps at their real sizes (keys3d.ts): MX top housings on the deck, which
+	// is the switches' plate, and Cherry-profile caps with the legends the keypad types.
 	const fontFamily = getComputedStyle(document.body).fontFamily;
 	await document.fonts.load(`700 120px ${fontFamily}`).catch(() => {});
-	const keycaps: THREE.Group[] = [];
-	const capGeometry = new RoundedBoxGeometry(17.8, 17.8, 7.6, 4, 2.2);
-	const capMaterial = new THREE.MeshStandardMaterial({ color: COLOR.keycap, roughness: 0.55 });
-	// The switches under the caps fill the deck's cutouts.
-	const switchGeometry = new THREE.BoxGeometry(14, 14, 5.2);
-	const switchMaterial = new THREE.MeshStandardMaterial({ color: COLOR.switch, roughness: 0.8 });
+	const switchMaterial = new THREE.MeshLambertMaterial({ color: COLOR.switch });
+	const housing = switchGeometry();
 	for (const x of KEY_X) {
-		const sw = new THREE.Mesh(switchGeometry, switchMaterial);
-		sw.position.set(x, KEY_Y, KEY_DECK_H + 1.6);
+		const sw = new THREE.Mesh(housing, switchMaterial);
+		sw.position.set(x, KEY_Y, KEY_DECK_H);
 		model.add(sw);
 	}
+	const keycaps: THREE.Group[] = [];
+	const capGeometry = keycapGeometry();
+	const capMaterial = new THREE.MeshLambertMaterial({ color: COLOR.keycap });
 	['Z', 'X', 'C'].forEach((letter, i) => {
 		const cap = new THREE.Group();
-		cap.position.set(KEY_X[i], KEY_Y, KEY_DECK_H + 3.4 + 3.8);
-		const body = new THREE.Mesh(capGeometry, capMaterial);
-		body.userData.key = i + 1;
+		cap.position.set(KEY_X[i], KEY_Y, KEY_DECK_H + CAP_REST);
+		// The top face's texture: the cap's colour with the legend, at the face's 12.7 x 14.6 mm.
 		const c = document.createElement('canvas');
-		c.width = c.height = 256;
+		c.width = 254;
+		c.height = 292;
 		const g = c.getContext('2d')!;
+		g.fillStyle = `#${new THREE.Color(COLOR.keycap).getHexString()}`;
+		g.fillRect(0, 0, c.width, c.height);
 		g.fillStyle = COLOR.legend;
-		g.font = `700 120px ${fontFamily}`;
+		g.font = `700 112px ${fontFamily}`;
 		g.textAlign = 'center';
 		g.textBaseline = 'middle';
-		g.fillText(letter, 128, 136);
-		const legendTexture = new THREE.CanvasTexture(c);
-		legendTexture.colorSpace = THREE.SRGBColorSpace;
-		legendTexture.anisotropy = 4;
-		const legend = new THREE.Mesh(
-			new THREE.PlaneGeometry(12, 12),
-			new THREE.MeshBasicMaterial({ map: legendTexture, transparent: true, toneMapped: false }),
-		);
-		legend.position.z = 3.81;
-		cap.add(body, legend);
+		g.fillText(letter, c.width / 2, c.height / 2 + 6);
+		const face = new THREE.CanvasTexture(c);
+		face.colorSpace = THREE.SRGBColorSpace;
+		face.anisotropy = 4;
+		const body = new THREE.Mesh(capGeometry, [capMaterial, new THREE.MeshLambertMaterial({ map: face })]);
+		body.userData.key = i + 1;
+		cap.add(body);
 		model.add(cap);
 		keycaps.push(cap);
 	});
@@ -219,10 +231,10 @@ export async function mount(figure: HTMLElement, opts: { still?: boolean } = {})
 	await paintScreen();
 	onChange(paintScreen);
 
-	// Keys go down the switch's travel while held, instantly, like the real thing.
+	// Keys go down the switch's full travel while held, instantly, like the real thing.
 	const capRest = keycaps.map((cap) => cap.position.z);
 	onKey((k, isDown) => {
-		keycaps[k - 1].position.z = capRest[k - 1] - (isDown ? 3.2 : 0);
+		keycaps[k - 1].position.z = capRest[k - 1] - (isDown ? TRAVEL : 0);
 		invalidate();
 	});
 

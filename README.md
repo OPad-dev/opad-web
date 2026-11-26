@@ -16,7 +16,7 @@ npm test
 `npm run dev` and `npm run build` first run:
 
 - `scripts/sync-docs.mjs`: copies the docs from the [OPad repository](https://github.com/OPad-dev/OPad) into `src/content/docs/`.
-- `scripts/sync-model.mjs`: converts the case model from the same repository into `public/models/`.
+- `scripts/sync-model.mjs`: converts the V4 case model from the same repository into `public/models/`, with the grooves along the side creases split out so the page can colour them.
 
 The OPad repository is the source of truth: both scripts fetch it from GitHub (branch `main`, as a sparse clone in `.cache/opad`) and overwrite the copies on every run. The copies are committed as a backup, so the site still builds offline; `opad-source.json` records the OPad commit they come from. Don't edit them here: edit the docs in the OPad repository (each docs page has an "Edit page" link to its file there).
 
@@ -27,3 +27,7 @@ To preview docs you haven't pushed yet, point `$OPAD_REPO_DIR` at a local checko
 ## Pending
 
 What is still needed to finish the site (in Spanish): [PENDIENTE.md](PENDIENTE.md).
+
+## Deploy
+
+`.github/workflows/deploy.yml` builds the site and publishes it on GitHub Pages on every push to `main`, every day, by hand, and on a `repository_dispatch` of type `opad-updated`. Each build fetches OPad's `main`, so the published docs and case follow it.

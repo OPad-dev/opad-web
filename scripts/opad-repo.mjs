@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 export const REPO_URL = 'https://github.com/OPad-dev/OPad';
 /** Branch the site follows: always main. */
 export const REF = 'main';
-const SPARSE = ['docs', 'hardware/3d/custom_case/V3'];
+const SPARSE = ['docs', 'hardware/3d/custom_case/V4'];
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const cache = join(root, '.cache', 'opad');
