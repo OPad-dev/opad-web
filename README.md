@@ -17,3 +17,7 @@ npm test
 
 - `scripts/sync-docs.mjs`: copies the docs from `$OPAD_DOCS_DIR` (default `../OPad-docs/docs`) into `src/content/docs/`. The copies are not committed.
 - `scripts/sync-model.mjs`: converts the case model from `$OPAD_REPO_DIR` (default `../OPad-docs`) into `public/models/`.
+
+## Pending
+
+What is still needed to finish the site (in Spanish): [PENDIENTE.md](PENDIENTE.md).
